@@ -1,0 +1,107 @@
+# =========================
+# Build outputs
+# =========================
+.build/
+Build/
+Bin-Int/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# =========================
+# CMake
+# =========================
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!Dependencies/**/CMakeLists.txt
+!Sources/**/CMakeLists.txt
+!CMakeLists.txt
+
+# =========================
+# Visual Studio
+# =========================
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.ilk
+*.pdb
+*.idb
+*.obj
+*.pch
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.opendb
+
+# =========================
+# JetBrains (CLion, Rider)
+# =========================
+.idea/
+*.iml
+cmake-build-*/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# Xcode (macOS)
+# =========================
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# =========================
+# Linux / GCC / Clang
+# =========================
+*.o
+*.a
+*.so
+*.so.*
+*.out
+
+# =========================
+# macOS
+# =========================
+.DS_Store
+._*
+
+# =========================
+# Windows
+# =========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =========================
+# Misc
+# =========================
+*.log
+*.tmp
+*~

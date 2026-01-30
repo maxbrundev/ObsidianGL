@@ -1,0 +1,27 @@
+project(OnyxEngine LANGUAGES CXX)
+
+file(GLOB_RECURSE ONYX_FILES CONFIGURE_DEPENDS
+    "main.cpp"
+    "src/*.cpp"
+    "include/*.h"
+)
+
+add_executable(OnyxEngine ${ONYX_FILES})
+
+set_target_properties(OnyxEngine PROPERTIES
+    FOLDER "Applications"
+    OBJECT_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin-Int/OnyxEngine
+)
+
+target_link_libraries(OnyxEngine 
+    PRIVATE 
+        ObsidianGL 
+        SDL3::SDL3
+	glm
+        stb_image
+)
+
+target_include_directories(OnyxEngine 
+    PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
