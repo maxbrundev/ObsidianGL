@@ -35,6 +35,7 @@ Makefile
 *.vcxproj.filters
 *.vcxproj.user
 *.sln
+*.slnx
 *.ilk
 *.pdb
 *.idb
