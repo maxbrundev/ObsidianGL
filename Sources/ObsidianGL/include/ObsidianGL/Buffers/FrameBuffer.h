@@ -93,7 +93,7 @@ namespace ObsidianGL::Buffers
 	}
 
 	template<typename T>
-	struct FrameBuffer
+	struct FrameBufferBase
 	{
 		static_assert(std::is_same_v<T, RGBA8> || std::is_same_v<T, Depth>, "FrameBuffer supports RGBA8 (uint32_t), Depth (float).");
 
@@ -102,10 +102,9 @@ namespace ObsidianGL::Buffers
 		uint32_t Width;
 		uint32_t Height;
 		uint32_t Size;
-		uint32_t ClearColor = 0x000000FF;
 		T* Data;
 
-		FrameBuffer(uint32_t p_width, uint32_t p_height) : 
+		FrameBufferBase(uint32_t p_width, uint32_t p_height) :
 		Width(p_width), 
 		Height(p_height), 
 		Size(Width* Height), 
@@ -113,15 +112,15 @@ namespace ObsidianGL::Buffers
 		{
 		}
 
-		FrameBuffer(const FrameBuffer&) = delete;
-		FrameBuffer& operator=(const FrameBuffer&) = delete;
+		FrameBufferBase(const FrameBufferBase&) = delete;
+		FrameBufferBase& operator=(const FrameBufferBase&) = delete;
 
-		~FrameBuffer()
+		~FrameBufferBase()
 		{
 			AlignedFree(Data);
 		}
 
-		FrameBuffer& operator=(FrameBuffer&& p_other) noexcept
+		FrameBufferBase& operator=(FrameBufferBase&& p_other) noexcept
 		{
 			if (this != &p_other)
 			{
@@ -139,46 +138,6 @@ namespace ObsidianGL::Buffers
 			}
 
 			return *this;
-		}
-
-		void SetClearColor(float p_r, float p_g, float p_b, float p_a)
-		{
-			static_assert(std::is_same_v<T, RGBA8>, "SetClearColor only valid for RGBA8 buffers.");
-
-			uint8_t r = static_cast<uint8_t>(std::clamp(p_r, 0.0f, 1.0f) * 255.0f);
-			uint8_t g = static_cast<uint8_t>(std::clamp(p_g, 0.0f, 1.0f) * 255.0f);
-			uint8_t b = static_cast<uint8_t>(std::clamp(p_b, 0.0f, 1.0f) * 255.0f);
-			uint8_t a = static_cast<uint8_t>(std::clamp(p_a, 0.0f, 1.0f) * 255.0f);
-
-			ClearColor = (r << 24) | (g << 16) | (b << 8) | a;
-		}
-
-		void Clear()
-		{
-			if constexpr (std::is_same_v<T, RGBA8>)
-			{
-				SIMDFill(reinterpret_cast<uint32_t*>(Data), Size, ClearColor);
-			}
-			else if constexpr (std::is_same_v<T, Depth>)
-			{
-				uint32_t depthMax = FloatToUint32(std::numeric_limits<float>::max());
-				SIMDFill(reinterpret_cast<uint32_t*>(Data), Size, depthMax);
-			}
-		}
-
-		void Resize(uint32_t p_width, uint32_t p_height)
-		{
-			if (Width == p_width && Height == p_height)
-				return;
-
-			AlignedFree(Data);
-
-			Width = p_width;
-			Height = p_height;
-			Size = Width * Height;
-
-			Data = static_cast<T*>(AlignedAlloc(Size * sizeof(T), Alignment));
-			Clear();
 		}
 
 		void SetPixel(uint32_t p_x, uint32_t p_y, T p_value)
@@ -209,4 +168,81 @@ namespace ObsidianGL::Buffers
 			return &Data[p_y * Width];
 		}
 	};
+
+	template<typename T>
+	struct FrameBuffer;
+
+	template<>
+	struct FrameBuffer<RGBA8> : FrameBufferBase<RGBA8>
+	{
+		uint32_t ClearColor = 0x000000FF;
+
+		FrameBuffer(uint32_t p_width, uint32_t p_height) :
+			FrameBufferBase<RGBA8>(p_width, p_height)
+		{
+		}
+
+		void SetClearColor(float p_r, float p_g, float p_b, float p_a)
+		{
+			uint8_t r = static_cast<uint8_t>(std::clamp(p_r, 0.0f, 1.0f) * 255.0f);
+			uint8_t g = static_cast<uint8_t>(std::clamp(p_g, 0.0f, 1.0f) * 255.0f);
+			uint8_t b = static_cast<uint8_t>(std::clamp(p_b, 0.0f, 1.0f) * 255.0f);
+			uint8_t a = static_cast<uint8_t>(std::clamp(p_a, 0.0f, 1.0f) * 255.0f);
+
+			ClearColor = (r << 24) | (g << 16) | (b << 8) | a;
+		}
+
+		void Clear()
+		{
+			SIMDFill(Data, Size, ClearColor);
+		}
+
+		void Resize(uint32_t p_width, uint32_t p_height)
+		{
+			if (Width == p_width && Height == p_height)
+				return;
+
+			AlignedFree(Data);
+
+			Width = p_width;
+			Height = p_height;
+			Size = Width * Height;
+
+			Data = static_cast<RGBA8*>(AlignedAlloc(Size * sizeof(RGBA8), Alignment));
+			Clear();
+		}
+	};
+
+	template<>
+	struct FrameBuffer<Depth> : FrameBufferBase<Depth>
+	{
+		FrameBuffer(uint32_t p_width, uint32_t p_height) :
+			FrameBufferBase<Depth>(p_width, p_height)
+		{
+		}
+
+		void Clear()
+		{
+			uint32_t depthMax = FloatToUint32(std::numeric_limits<float>::max());
+			SIMDFill(reinterpret_cast<uint32_t*>(Data), Size, depthMax);
+		}
+
+		void Resize(uint32_t p_width, uint32_t p_height)
+		{
+			if (Width == p_width && Height == p_height)
+				return;
+
+			AlignedFree(Data);
+
+			Width = p_width;
+			Height = p_height;
+			Size = Width * Height;
+
+			Data = static_cast<Depth*>(AlignedAlloc(Size * sizeof(Depth), Alignment));
+			Clear();
+		}
+	};
+
+	using ColorBuffer = FrameBuffer<RGBA8>;
+	using DepthBuffer = FrameBuffer<Depth>;
 }

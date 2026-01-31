@@ -11,7 +11,7 @@ SDL_Texture* texture   = nullptr;
 constexpr uint16_t width = 800;
 constexpr uint16_t height = 600;
 
-ObsidianGL::Buffers::FrameBuffer<RGBA8> framebuffer(width, height);
+ObsidianGL::Buffers::ColorBuffer framebuffer(width, height);
 
 SDL_AppResult SDL_AppInit(void**, int, char**)
 {

@@ -1,6 +1,6 @@
 ﻿#include "ObsidianGL/ObsidianGL.h"
 
-void ObsidianGL::Test(Buffers::FrameBuffer<RGBA8>& p_outBuffer)
+void ObsidianGL::Test(Buffers::ColorBuffer& p_outBuffer)
 {
 	const uint32_t width = p_outBuffer.Width;
 	const uint32_t height = p_outBuffer.Height;

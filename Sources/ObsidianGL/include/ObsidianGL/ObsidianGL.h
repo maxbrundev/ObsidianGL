@@ -6,5 +6,5 @@
 
 namespace ObsidianGL
 {
-	OBSIDIANGL_API void Test(Buffers::FrameBuffer<RGBA8>& p_outBuffer);
+	OBSIDIANGL_API void Test(Buffers::ColorBuffer& p_outBuffer);
 }
