@@ -8,8 +8,10 @@ SDL_Window* window     = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Texture* texture   = nullptr;
 
-unsigned int* pixels = nullptr;
-ObsidianGL::FrameBuffer framebuffer;
+constexpr uint16_t width = 800;
+constexpr uint16_t height = 600;
+
+ObsidianGL::Buffers::FrameBuffer<RGBA8> framebuffer(width, height);
 
 SDL_AppResult SDL_AppInit(void**, int, char**)
 {
@@ -21,9 +23,6 @@ SDL_AppResult SDL_AppInit(void**, int, char**)
 		return SDL_APP_FAILURE;
 	}
 
-	const uint16_t width = 800;
-	const uint16_t height = 600;
-
 	if (!SDL_CreateWindowAndRenderer("OnyxEngine", width, height, SDL_WINDOW_RESIZABLE, &window, &renderer))
 	{
 		SDL_Log("Window/Renderer creation failed: %s", SDL_GetError());
@@ -32,12 +31,6 @@ SDL_AppResult SDL_AppInit(void**, int, char**)
 	}
 
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
-
-	pixels = new uint32_t[width * height];
-
-	framebuffer.Width = width;
-	framebuffer.Height = height;
-	framebuffer.Pixels = pixels;
 
 	return SDL_APP_CONTINUE;
 }
@@ -52,9 +45,9 @@ SDL_AppResult SDL_AppEvent(void*, SDL_Event* event)
 
 SDL_AppResult SDL_AppIterate(void*)
 {
-	ObsidianGL::Test(&framebuffer);
+	ObsidianGL::Test(framebuffer);
 
-	SDL_UpdateTexture(texture, nullptr, pixels, framebuffer.Width * sizeof(unsigned int));
+	SDL_UpdateTexture(texture, nullptr, framebuffer.Data, width * sizeof(uint32_t));
 
 	SDL_RenderClear(renderer);
 	SDL_RenderTexture(renderer, texture, nullptr, nullptr);
@@ -65,8 +58,6 @@ SDL_AppResult SDL_AppIterate(void*)
 
 void SDL_AppQuit(void*, SDL_AppResult)
 {
-	delete[] pixels;
-
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

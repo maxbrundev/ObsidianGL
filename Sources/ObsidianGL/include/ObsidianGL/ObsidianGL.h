@@ -1,17 +1,10 @@
 ﻿#pragma once
 
-#include <cstdint>
-
 #include "API/Export.h"
+
+#include "Buffers/FrameBuffer.h"
 
 namespace ObsidianGL
 {
-	struct FrameBuffer
-	{
-		uint16_t Width;
-		uint16_t Height;
-		uint32_t* Pixels;
-	};
-
-	OBSIDIANGL_API void Test(const FrameBuffer* p_outBuffer);
+	OBSIDIANGL_API void Test(Buffers::FrameBuffer<RGBA8>& p_outBuffer);
 }
