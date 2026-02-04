@@ -2,9 +2,8 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstring>
-#include <type_traits>
 #include <limits>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <malloc.h>
@@ -15,6 +14,8 @@
 #else
 #include <emmintrin.h>
 #endif
+
+#include "ObsidianGL/Utils/Bitwise/Common.h"
 
 typedef uint32_t RGBA8;
 typedef float Depth;
@@ -39,20 +40,6 @@ namespace ObsidianGL::Buffers
 #else
 		std::free(p_ptr);
 #endif
-	}
-
-	inline uint32_t FloatToUint32(float p_value)
-	{
-		uint32_t bits;
-		std::memcpy(&bits, &p_value, sizeof(float));
-		return bits;
-	}
-
-	inline float Uint32ToFloat(uint32_t p_bits)
-	{
-		float value;
-		std::memcpy(&value, &p_bits, sizeof(float));
-		return value;
 	}
 
 	inline void SIMDFill(uint32_t* p_data, size_t p_size, uint32_t p_value)
@@ -148,7 +135,7 @@ namespace ObsidianGL::Buffers
 			}
 			else if constexpr (std::is_same_v<T, Depth>)
 			{
-				reinterpret_cast<uint32_t*>(Data)[p_y * Width + p_x] = FloatToUint32(p_value);
+				reinterpret_cast<uint32_t*>(Data)[p_y * Width + p_x] = Utils::Bitwise::FloatToUint32(p_value);
 			}
 		}
 
@@ -160,7 +147,7 @@ namespace ObsidianGL::Buffers
 			}
 			
 			// T is Depth.
-			return Uint32ToFloat(reinterpret_cast<uint32_t*>(Data)[p_y * Width + p_x]);
+			return Utils::Bitwise::Uint32ToFloat(reinterpret_cast<uint32_t*>(Data)[p_y * Width + p_x]);
 		}
 
 		T* GetRow(uint32_t p_y)
@@ -177,8 +164,7 @@ namespace ObsidianGL::Buffers
 	{
 		uint32_t ClearColor = 0x000000FF;
 
-		FrameBuffer(uint32_t p_width, uint32_t p_height) :
-			FrameBufferBase<RGBA8>(p_width, p_height)
+		FrameBuffer(uint32_t p_width, uint32_t p_height) : FrameBufferBase<RGBA8>(p_width, p_height)
 		{
 		}
 
@@ -216,14 +202,14 @@ namespace ObsidianGL::Buffers
 	template<>
 	struct FrameBuffer<Depth> : FrameBufferBase<Depth>
 	{
-		FrameBuffer(uint32_t p_width, uint32_t p_height) :
-			FrameBufferBase<Depth>(p_width, p_height)
+		FrameBuffer(uint32_t p_width, uint32_t p_height) : FrameBufferBase<Depth>(p_width, p_height)
 		{
 		}
 
 		void Clear()
 		{
-			uint32_t depthMax = FloatToUint32(std::numeric_limits<float>::max());
+			uint32_t depthMax = Utils::Bitwise::FloatToUint32(std::numeric_limits<float>::max());
+
 			SIMDFill(reinterpret_cast<uint32_t*>(Data), Size, depthMax);
 		}
 
