@@ -5,46 +5,19 @@
 #include <limits>
 #include <type_traits>
 
-#ifdef _WIN32
-#include <malloc.h>
-#endif
-
-#ifdef __AVX2__
-#include <immintrin.h>
-#else
-#include <emmintrin.h>
-#endif
+#include "ObsidianGL/API/SIMDConfig.h"
 
 #include "ObsidianGL/Utils/Bitwise/Common.h"
+#include "ObsidianGL/Utils/Memory/Common.h"
 
 typedef uint32_t RGBA8;
 typedef float Depth;
 
 namespace ObsidianGL::Buffers
 {
-	inline void* AlignedAlloc(size_t p_size, size_t p_alignment)
-	{
-		size_t alignedSize = (p_size + p_alignment - 1) & ~(p_alignment - 1);
-
-#ifdef _WIN32
-		return _aligned_malloc(alignedSize, p_alignment);
-#else
-		return std::aligned_alloc(p_alignment, alignedSize);
-#endif
-	}
-
-	inline void AlignedFree(void* p_ptr)
-	{
-#ifdef _WIN32
-		_aligned_free(p_ptr);
-#else
-		std::free(p_ptr);
-#endif
-	}
-
 	inline void SIMDFill(uint32_t* p_data, size_t p_size, uint32_t p_value)
 	{
-#ifdef __AVX2__
+#ifdef OBSIDIAN_USE_AVX2
 		__m256i fillValue = _mm256_set1_epi32(static_cast<int>(p_value));
 
 		size_t blockCount = p_size / 16;
@@ -92,10 +65,10 @@ namespace ObsidianGL::Buffers
 		T* Data;
 
 		FrameBufferBase(uint32_t p_width, uint32_t p_height) :
-		Width(p_width), 
-		Height(p_height), 
-		Size(Width* Height), 
-		Data(static_cast<T*>(AlignedAlloc(Size * sizeof(T), Alignment)))
+			Width(p_width),
+			Height(p_height),
+			Size(Width* Height),
+			Data(static_cast<T*>(ObsidianGL::Utils::Memory::AlignedAlloc(Size * sizeof(T), Alignment)))
 		{
 		}
 
@@ -104,7 +77,7 @@ namespace ObsidianGL::Buffers
 
 		~FrameBufferBase()
 		{
-			AlignedFree(Data);
+			ObsidianGL::Utils::Memory::AlignedFree(Data);
 		}
 
 		FrameBufferBase& operator=(FrameBufferBase&& p_other) noexcept
@@ -145,7 +118,7 @@ namespace ObsidianGL::Buffers
 			{
 				return Data[p_y * Width + p_x];
 			}
-			
+
 			// T is Depth.
 			return Utils::Bitwise::Uint32ToFloat(reinterpret_cast<uint32_t*>(Data)[p_y * Width + p_x]);
 		}
@@ -188,13 +161,13 @@ namespace ObsidianGL::Buffers
 			if (Width == p_width && Height == p_height)
 				return;
 
-			AlignedFree(Data);
+			Utils::Memory::AlignedFree(Data);
 
 			Width = p_width;
 			Height = p_height;
 			Size = Width * Height;
 
-			Data = static_cast<RGBA8*>(AlignedAlloc(Size * sizeof(RGBA8), Alignment));
+			Data = static_cast<RGBA8*>(Utils::Memory::AlignedAlloc(Size * sizeof(RGBA8), Alignment));
 			Clear();
 		}
 	};
@@ -218,13 +191,13 @@ namespace ObsidianGL::Buffers
 			if (Width == p_width && Height == p_height)
 				return;
 
-			AlignedFree(Data);
+			Utils::Memory::AlignedFree(Data);
 
 			Width = p_width;
 			Height = p_height;
 			Size = Width * Height;
 
-			Data = static_cast<Depth*>(AlignedAlloc(Size * sizeof(Depth), Alignment));
+			Data = static_cast<Depth*>(Utils::Memory::AlignedAlloc(Size * sizeof(Depth), Alignment));
 			Clear();
 		}
 	};

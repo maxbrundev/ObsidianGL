@@ -2,11 +2,16 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image/stb_image.h>
+
 #include <ObsidianGL/ObsidianGL.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+
+// Dirty main for quick tests
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -26,6 +31,41 @@ bool firstMouse = true;
 float cubeRotation = 0.0f;
 
 uint64_t lastTime = 0;
+
+uint32_t cubeTextureId = 0;
+
+const char* TEXTURE_PATH = "dirt.bmp";
+
+uint32_t LoadTexture(const char* p_path)
+{
+	int w, h, channels;
+	unsigned char* pixels = stbi_load(p_path, &w, &h, &channels, 0);
+
+	if (!pixels)
+	{
+		SDL_Log("Failed to load texture: %s (stbi: %s)", p_path, stbi_failure_reason());
+		return 0;
+	}
+
+	uint32_t texId = ObsidianGL::GenTexture();
+	ObsidianGL::BindTexture(texId);
+
+	uint16_t format = (channels == 4) ? ObsidianGL::OGL_RGBA : ObsidianGL::OGL_RGB;
+	ObsidianGL::TexImage2D(format, static_cast<uint32_t>(w), static_cast<uint32_t>(h), format, ObsidianGL::OGL_UNSIGNED_BYTE, pixels);
+
+	ObsidianGL::TexParameteri(ObsidianGL::OGL_TEXTURE_MIN_FILTER, ObsidianGL::OGL_NEAREST);
+	ObsidianGL::TexParameteri(ObsidianGL::OGL_TEXTURE_MAG_FILTER, ObsidianGL::OGL_NEAREST);
+	ObsidianGL::TexParameteri(ObsidianGL::OGL_TEXTURE_WRAP_S, ObsidianGL::OGL_REPEAT);
+	ObsidianGL::TexParameteri(ObsidianGL::OGL_TEXTURE_WRAP_T, ObsidianGL::OGL_REPEAT);
+
+	ObsidianGL::BindTexture(0);
+
+	stbi_image_free(pixels);
+
+	SDL_Log("Loaded texture: %s (%dx%d, %d channels)", p_path, w, h, channels);
+
+	return texId;
+}
 
 void DrawCube()
 {
@@ -76,6 +116,51 @@ void DrawCube()
 	ObsidianGL::End();
 }
 
+void DrawTexturedCube()
+{
+	ObsidianGL::Begin(ObsidianGL::OGL_QUADS);
+
+	ObsidianGL::Color3f(1.0f, 1.0f, 1.0f);
+
+	ObsidianGL::Normal3f(0.0f, 0.0f, 1.0f);
+	ObsidianGL::TexCoord2f(0.0f, 1.0f); ObsidianGL::Vertex3f(-0.5f, -0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(0.0f, 0.0f); ObsidianGL::Vertex3f(-0.5f, 0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 0.0f); ObsidianGL::Vertex3f(0.5f, 0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 1.0f); ObsidianGL::Vertex3f(0.5f, -0.5f, 0.5f);
+
+	ObsidianGL::Normal3f(0.0f, 0.0f, -1.0f);
+	ObsidianGL::TexCoord2f(0.0f, 1.0f); ObsidianGL::Vertex3f(0.5f, -0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(0.0f, 0.0f); ObsidianGL::Vertex3f(0.5f, 0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 0.0f); ObsidianGL::Vertex3f(-0.5f, 0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 1.0f); ObsidianGL::Vertex3f(-0.5f, -0.5f, -0.5f);
+
+	ObsidianGL::Normal3f(0.0f, 1.0f, 0.0f);
+	ObsidianGL::TexCoord2f(0.0f, 1.0f); ObsidianGL::Vertex3f(-0.5f, 0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(0.0f, 0.0f); ObsidianGL::Vertex3f(-0.5f, 0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 0.0f); ObsidianGL::Vertex3f(0.5f, 0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 1.0f); ObsidianGL::Vertex3f(0.5f, 0.5f, 0.5f);
+
+	ObsidianGL::Normal3f(0.0f, -1.0f, 0.0f);
+	ObsidianGL::TexCoord2f(0.0f, 1.0f); ObsidianGL::Vertex3f(-0.5f, -0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(0.0f, 0.0f); ObsidianGL::Vertex3f(-0.5f, -0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 0.0f); ObsidianGL::Vertex3f(0.5f, -0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 1.0f); ObsidianGL::Vertex3f(0.5f, -0.5f, -0.5f);
+
+	ObsidianGL::Normal3f(1.0f, 0.0f, 0.0f);
+	ObsidianGL::TexCoord2f(0.0f, 1.0f); ObsidianGL::Vertex3f(0.5f, -0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(0.0f, 0.0f); ObsidianGL::Vertex3f(0.5f, 0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 0.0f); ObsidianGL::Vertex3f(0.5f, 0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 1.0f); ObsidianGL::Vertex3f(0.5f, -0.5f, -0.5f);
+
+	ObsidianGL::Normal3f(-1.0f, 0.0f, 0.0f);
+	ObsidianGL::TexCoord2f(0.0f, 1.0f); ObsidianGL::Vertex3f(-0.5f, -0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(0.0f, 0.0f); ObsidianGL::Vertex3f(-0.5f, 0.5f, -0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 0.0f); ObsidianGL::Vertex3f(-0.5f, 0.5f, 0.5f);
+	ObsidianGL::TexCoord2f(1.0f, 1.0f); ObsidianGL::Vertex3f(-0.5f, -0.5f, 0.5f);
+
+	ObsidianGL::End();
+}
+
 SDL_AppResult SDL_AppInit(void**, int, char**)
 {
 	SDL_SetAppMetadata("OnyxEngine", "0.1", "com.obsidian.onyx");
@@ -99,6 +184,8 @@ SDL_AppResult SDL_AppInit(void**, int, char**)
 	ObsidianGL::Enable(ObsidianGL::OGL_DEPTH_TEST);
 	ObsidianGL::Enable(ObsidianGL::OGL_CULL_FACE);
 	ObsidianGL::CullFace(ObsidianGL::OGL_BACK);
+
+	cubeTextureId = LoadTexture(TEXTURE_PATH);
 
 	lastTime = SDL_GetPerformanceCounter();
 
@@ -196,10 +283,23 @@ SDL_AppResult SDL_AppIterate(void*)
 	DrawCube();
 	ObsidianGL::PopMatrix();
 
+	ObsidianGL::EnableTexture2D();
+	ObsidianGL::BindTexture(cubeTextureId);
+
 	ObsidianGL::PushMatrix();
 	ObsidianGL::Translatef(2.0f, 0.0f, 0.0f);
-	DrawCube();
+	DrawTexturedCube();
 	ObsidianGL::PopMatrix();
+
+	ObsidianGL::PolygonMode(ObsidianGL::OGL_FRONT, ObsidianGL::OGL_LINE);
+	ObsidianGL::PushMatrix();
+	ObsidianGL::Translatef(4.0f, 0.0f, 0.0f);
+	DrawTexturedCube();
+	ObsidianGL::PopMatrix();
+	ObsidianGL::PolygonMode(ObsidianGL::OGL_FRONT, ObsidianGL::OGL_FILL);
+
+	ObsidianGL::DisableTexture2D();
+	ObsidianGL::BindTexture(0);
 
 	ObsidianGL::Begin(ObsidianGL::OGL_TRIANGLES);
 	ObsidianGL::Color3f(1.0f, 0.0f, 0.0f);
