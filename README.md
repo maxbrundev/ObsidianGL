@@ -25,7 +25,7 @@ Coming soon:
 - Tile debug overlay (heat map, grid, per-tile visibility control)
 
 # Video and Screenshots
-<img width="802" height="632" alt="image" src="https://github.com/user-attachments/assets/f7ed69b6-f6d9-441c-b251-fbe734c08115" />
+<img width="802" height="632" alt="image" src="https://github.com/user-attachments/assets/ab2821b5-c3cb-417e-a119-fc1fbd323f59" />
 <img width="802" height="632" alt="Screenshot 2026-02-16 205801" src="https://github.com/user-attachments/assets/40bdd92c-c0f3-4c04-9f1c-7b68e9c839f9" />
 <img width="802" height="632" alt="Screenshot 2026-02-16 205822" src="https://github.com/user-attachments/assets/72b73707-0f49-41f4-9878-00ccb6b11f03" />
 
