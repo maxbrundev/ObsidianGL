@@ -30,7 +30,7 @@ Minecraft 0.30 running on CPU using ObsidianGL and a Java bridge. I removed all 
 
 https://github.com/user-attachments/assets/f22f4969-07eb-465c-918e-3db4355673d9
 
-[![perf showcase](https://img.youtube.com/vi/gS9VbkYYQCY/maxresdefault.jpg?cache=2026)](https://www.youtube.com/watch?v=gS9VbkYYQCY)
+[![perf showcase](https://img.youtube.com/vi/76hhAE4pQVc/maxresdefault.jpg?cache=2026)](https://www.youtube.com/watch?v=76hhAE4pQVc)
 
 <img width="802" height="632" alt="image" src="https://github.com/user-attachments/assets/ab2821b5-c3cb-417e-a119-fc1fbd323f59" />
 <img width="802" height="632" alt="Screenshot 2026-02-16 205801" src="https://github.com/user-attachments/assets/40bdd92c-c0f3-4c04-9f1c-7b68e9c839f9" />
