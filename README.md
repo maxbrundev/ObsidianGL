@@ -32,6 +32,7 @@ https://github.com/user-attachments/assets/f22f4969-07eb-465c-918e-3db4355673d9
 
 [![perf showcase](https://img.youtube.com/vi/76hhAE4pQVc/maxresdefault.jpg?cache=2026)](https://www.youtube.com/watch?v=76hhAE4pQVc)
 
+<img width="1282" height="752" alt="Screenshot 2026-03-30 012418" src="https://github.com/user-attachments/assets/8a5406f5-f7cb-4a1c-9825-e7b5d66158f2" />
 <img width="802" height="632" alt="image" src="https://github.com/user-attachments/assets/ab2821b5-c3cb-417e-a119-fc1fbd323f59" />
 <img width="802" height="632" alt="Screenshot 2026-02-16 205801" src="https://github.com/user-attachments/assets/40bdd92c-c0f3-4c04-9f1c-7b68e9c839f9" />
 <img width="802" height="632" alt="Screenshot 2026-02-16 205822" src="https://github.com/user-attachments/assets/72b73707-0f49-41f4-9878-00ccb6b11f03" />
